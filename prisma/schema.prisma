@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+enum Role {
+  User
+  ADMIN
+  SUPER
+}
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  age Int
+  email String
+  role Role @default(User) // default user ha u qaato
+  // profile Profile? // marka kowa mlga rabo // one to one
+  
+  posts Post[]
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  // @@id(['']) // labada column ee aad rabtid inaa ka dhigtid primary key
+  // @@index([]) : markaa email-ka la raadinayo waxa uu noqonaa Fast makaa 1milyan email radineso waa culess lkn sidan ayaa fudud
+  // wax search la xariiro index baa la isticmaala
+  
+}
+// one to many
+model Post {
+  id String @id @default(uuid())
+  title String
+  content String
+  user User @relation(fields: [userId], references: [id], onUpdate:Cascade, onDelete: Cascade )
+  userId Int 
+}
+// model Profile {
+//   id Int @id @default(autoincrement())
+//   image String
+//   user User @relation(fields: [userId], references: [id])
+//   userId Int @unique
+// }
+
+// uuid = id ka kooban xarfo iyo lambari
+
+
+
+
+// many to many
+
+// 1. explicit way
+// model Student {
+//   id Int @id @default(autoincrement())
+//   name String
+//   // courses CourseOnStudents[]
+//   course Course[]
+// }
+
+// model Course {
+//   id Int @id @default(autoincrement())
+//   name String
+//   // students CourseOnStudents[]
+//   student Student[] // way-gan ayaa fudud manual
+  
+// }
+
+// model CourseOnStudents {
+//   course Course @relation(fields: [courseId] ,references: [id])
+//   courseId Int
+//   student Student @relation(fields: [studentId], references: [id])
+//   studentId Int
+
+//   @@id([studentId, courseId]) // 2 field haddad u rabtid primary key waxaa la siiya @@id
+// }
+
+
+
+// Referential action 
+
+// Cascade = update-ka dhaco ogeysii oo la update garee
+// onDelete: Cascade : haddi la delete gareeyana raaci oo wax ha keydin
+// onDelete: Cascade : 
+
+
+// Restrict
+// NoAction
+// SetNull
+// SetDefault
+
